@@ -10,6 +10,22 @@ export default function AdminPage() {
   const [students, setStudents] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyStudentsList = () => {
+    if (students.length === 0) return;
+    const listText = `Присутствовали на уроке (Всего: ${students.length}):\n` + 
+      students.map((student, idx) => `${idx + 1}. ${student}`).join('\n');
+    
+    navigator.clipboard.writeText(listText)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Ошибка при копировании списка:", err);
+      });
+  };
 
   useEffect(() => {
     // Получаем origin
@@ -127,9 +143,17 @@ export default function AdminPage() {
       </div>
 
       <div className="w-full max-w-md border border-black rounded-none">
-        {/* МИНИ-СЧЕТЧИК */}
-        <div className="bg-white border-b border-black text-black p-4 uppercase font-bold text-lg text-center tracking-widest">
-          ОТМЕТИЛОСЬ УЧЕНИКОВ: {students.length}
+        {/* МИНИ-СЧЕТЧИК И КНОПКА КОПИРОВАНИЯ */}
+        <div className="bg-white border-b border-black text-black p-4 uppercase font-bold text-lg flex flex-col sm:flex-row justify-between items-center gap-4 tracking-widest text-center sm:text-left">
+          <span>ОТМЕТИЛОСЬ УЧЕНИКОВ: {students.length}</span>
+          {students.length > 0 && (
+            <button 
+              onClick={copyStudentsList}
+              className="px-3 py-2 border border-black bg-black text-white text-xs hover:bg-white hover:text-black transition-colors uppercase font-bold tracking-wider rounded-none w-full sm:w-auto"
+            >
+              {copied ? "Скопировано!" : "Копировать список"}
+            </button>
+          )}
         </div>
         
         <ul className="divide-y divide-black max-h-96 overflow-y-auto bg-white">
